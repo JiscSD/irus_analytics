@@ -1,10 +1,10 @@
 # IrusAnalytics
 
-IrusAnalytics is a gem that provides a simple way to send analytics to the IRUS repository aggregation service.  
+IrusAnalytics is a gem that provides a simple way to send analytics to the IRUS repository aggregation service.
 
-More information about IRUS can be found at [https://irus.jisc.ac.uk/r5/](https://irus.jisc.ac.uk/r5/). In summary the IRUS service is designed to provide item-level usage statistics, both for Investigations (views) and Requests (downloads), for Institutional Repositories.  To sign up and use IRUS, please see the above link. 
+More information about IRUS can be found at [https://irus.jisc.ac.uk/r5/](https://irus.jisc.ac.uk/r5/). In summary the IRUS service is designed to provide item-level usage statistics, both for Investigations (views) and Requests (downloads), for Institutional Repositories.  To sign up and use IRUS, please see the above link.
 
-This gem was developed for use with a Hyrax repository [http://samvera.org/](http://samvera.org/), but it can be used with any other web application supporting Ruby gems. 
+This gem was developed for use with a Hyrax repository [http://samvera.org/](http://samvera.org/), but it can be used with any other web application supporting Ruby gems.
 
 More information on COUNTER reports and reporting can be found at [Project COUNTER](https://www.projectcounter.org/)
 
@@ -51,7 +51,7 @@ This uses a similar mechanism to the standard rails database.yml file to allow f
  is used to define the IRUS server endpoint, this can be configured for the test version of the service.
 
 **robots_file**\
-is used to specify the name of the file containing the robot UserAgents as regular expressions.  
+is used to specify the name of the file containing the robot UserAgents as regular expressions.
 
 **Example installed file**
 
@@ -211,8 +211,8 @@ end
 
 Therefore in summary...
 
-    include IrusAnalytics::Controller::AnalyticsBehaviour  
-  
+    include IrusAnalytics::Controller::AnalyticsBehaviour
+
     after_filter :send_analytics, only: [:show]
 
     def item_identifier_for_irus_analytics
@@ -223,19 +223,7 @@ Therefore in summary...
 
 NOTE: If you are not using the [Blacklight OAI Provider](https://github.com/projectblacklight/blacklight_oai_provider) gem to create your OAI feed, you'll need to modify the `item_identifier_for_irus_analytics` method to conform with your application's [OAI identifiers](http://www.openarchives.org/OAI/2.0/guidelines-oai-identifier.htm).
 
-To be compliant with the IRUS client requirements/recommendations this Gem makes use of the Resque  [https://github.com/resque/resque](https://github.com/resque/resque).  Resque provides a simple way to create background jobs within your Ruby application, and is specifically used within this gem to push the analytics posts onto a queue.  This means the download functionality within your application is unaffected by the send analytics call, and it provides a means of queuing analytics if the IRUS server is down. 
-
-Note: Resque requires Redis to be installed  
-
-By installing this gem, your application should have access to the Resque rake tasks.  These can be seen by running "rake -T",  the list should include:-
-
-    rake resque:failures:sort 
-    rake resque:work
-    rake resque:workers
-
-To start the resque background job for this gem use
-
-    QUEUE=irus_analytics rake environment resque:work
+To be compliant with the IRUS client requirements/recommendations this Gem makes use of the ActiveJob. Any working ActiveJob adapter should work for the processing of the background jobs and is specifically used within this gem to push the analytics posts onto a queue.  This means the download functionality within your application is unaffected by the send analytics call, and it provides a means of queuing analytics if the IRUS server is down.
 
 ## Additional Notes for Hyrax
 

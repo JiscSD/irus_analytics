@@ -1,5 +1,5 @@
-require "resque/server"
 require 'irus_analytics/elements'
+require 'active_job'
 require 'irus_analytics/irus_analytics_logger'
 if defined?(Rails)
   require 'rails/generators'

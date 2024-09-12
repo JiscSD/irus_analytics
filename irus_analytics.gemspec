@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "openurl" # https://github.com/openurl/openurl
-  spec.add_dependency "resque"
+  spec.add_dependency "activejob"
   spec.add_dependency 'config_files' # https://github.com/blackrat/config_files
   spec.add_dependency 'i18n'
 

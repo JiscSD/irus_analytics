@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'logger'
-require 'resque'
 require 'active_support/core_ext/module/delegation'
 require 'irus_analytics/configuration'
 require 'irus_analytics/irus_analytics_logger'
@@ -123,7 +122,7 @@ module IrusAnalytics
                        "@identifier=#{@identifier}",
                        "@usage_event_type=#{@usage_event_type}",
                        "" ] if verbose_debug
-          Resque.enqueue(IrusClient, server, params, @usage_event_type)
+          IrusClient.perform_later(server, params, @usage_event_type)
         rescue Exception => e
           logger.error(%Q(#{I18n.t('.error', method: debugger_method, scope: i18n_scope)}:#{I18n.t('.enquing_error', error: e, scope: i18n_scope)}))
         end

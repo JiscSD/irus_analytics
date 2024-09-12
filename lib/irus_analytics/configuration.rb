@@ -32,11 +32,13 @@ module IrusAnalytics
 
         define_method name do
           rv = nil
-          if defined?( Settings ) && Settings.hostname.present?
-            if irus_analytics_config[Rails.env][:named_servers].present?
-              named_server = Settings.hostname
-              rv = irus_analytics_config[Rails.env][named_server][name.to_s]
-            end
+          # Handle multi-tenant hyku _and_ hyrax, both of them using the named_servers section of the config file
+          if irus_analytics_config[Rails.env]['named_servers'].present?
+            # hyrax?
+            named_server = Settings.hostname if defined?( Settings ) && Settings.hostname.present?
+            # hyku?
+            named_server = Site.account.cname if defined?( Site ) && Site.account&.cname.present?
+            rv = irus_analytics_config[Rails.env][named_server][name.to_s] if irus_analytics_config[Rails.env][named_server].present?
           end
           rv = irus_analytics_config[Rails.env][name.to_s] if rv.blank?
           rv

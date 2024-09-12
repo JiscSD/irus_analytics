@@ -40,12 +40,13 @@ describe IrusAnalytics::Controller::AnalyticsBehaviour do
                   http_referer: "http://localhost:3000",
                   source_repository: "hydra.hull.ac.uk"
        }
-       allow(Resque).to receive(:enqueue) .and_return(nil)
        # Should NOT filter this request
        expect(@test_class).to receive(:filter_request?).and_return(false)
-       expect(Resque).to receive(:enqueue).with(IrusAnalytics::IrusClient,
-                                                "irus-server-address.org",
-                                                params, IrusAnalytics::REQUEST )
+       expect(IrusAnalytics::IrusClient).to receive(:perform_later).with(
+         "irus-server-address.org",
+         params,
+         IrusAnalytics::REQUEST
+       ).and_return(nil)
        @test_class.send_irus_analytics
     end
 
@@ -64,14 +65,13 @@ describe IrusAnalytics::Controller::AnalyticsBehaviour do
                  http_referer: "http://localhost:3000",
                  source_repository: "hydra.hull.ac.uk"
       }
-      allow(Resque).to receive(:enqueue).and_return(nil)
       expect(@test_class).to_not receive(:filter_request?)
-      expect(Resque).to_not receive(:enqueue)
+      expect(IrusAnalytics::IrusClient).to_not receive(:perform_later)
       @test_class.send_irus_analytics
     end
 
     it "will not call the send_irus_analytics method when there is a filter user-agent.." do
-       # Add a well known robot... 
+       # Add a well known robot...
        @test_class.request  = double("request", :remote_ip => "127.0.0.1", :user_agent => "Microsoft URL Control - 6.00.8862",  url: "http://localhost:3000/test", referer: "http://localhost:3000", headers: { "HTTP_RANGE" => nil })
        # We set the datetime stamp to ensure sync
        date_time = "2014-06-09T16:56:48Z"
@@ -81,15 +81,18 @@ describe IrusAnalytics::Controller::AnalyticsBehaviour do
        params = { date_stamp: date_time, client_ip_address: "127.0.0.1", user_agent: "Microsoft URL Control - 6.00.8862" ,item_oai_identifier: "test:123",
                   file_url: "http://localhost:3000/test", http_referer: "http://localhost:3000",  source_repository: "hydra.hull.ac.uk" }
 
-       allow(Resque).to receive(:enqueue) .and_return(nil)
        # Should filter this request
-       expect(Resque).to_not receive(:enqueue).with(IrusAnalytics::IrusClient, "irus-server-address.org", params )
+       expect(IrusAnalytics::IrusClient).to_not receive(:perform_later).with(
+         "irus-server-address.org",
+         params
+       )
+
        @test_class.send_irus_analytics
     end
 
 
     it "will not call the send_irus_analytics method when the request is expecting a chunk of data (HTTP_RANGE downloading data)." do
-       # Add a well known robot... 
+       # Add a well known robot...
        @test_class.request  = double("request", :remote_ip => "127.0.0.1", :user_agent =>"Test user agent",  url: "http://localhost:3000/test", referer: "http://localhost:3000", headers: { "HTTP_RANGE" => "bytes=0-65535"})
        # We set the datetime stamp to ensure sync
        date_time = "2014-06-09T16:56:48Z"
@@ -99,12 +102,15 @@ describe IrusAnalytics::Controller::AnalyticsBehaviour do
        params = { date_stamp: date_time, client_ip_address: "127.0.0.1", user_agent: "Microsoft URL Control - 6.00.8862" ,item_oai_identifier: "test:123",
                   file_url: "http://localhost:3000/test", http_referer: "http://localhost:3000",  source_repository: "hydra.hull.ac.uk" }
 
-       allow(Resque).to receive(:enqueue) .and_return(nil)
        # Should filter this request
-       expect(Resque).to_not receive(:enqueue).with(IrusAnalytics::IrusClient, "irus-server-address.org", params )
+       expect(IrusAnalytics::IrusClient).to_not receive(:perform_later).with(
+         "irus-server-address.org",
+         params
+       )
+
        @test_class.send_irus_analytics
     end
 
 
-  end  
+  end
 end
